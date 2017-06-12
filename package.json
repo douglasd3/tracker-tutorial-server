@@ -1,0 +1,9 @@
+{
+  "name": "TrackerTutorial",
+  "version": "1.0",
+  "description": "Tracker de um transporte",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^2.0.1"
+  }
+}
