@@ -28,30 +28,18 @@
 
       //Remove user from tracked user list
       disconnectTrackedUser(clientSocket.id); 
-
-      //Let app know that we have a new tracked user list data
-      emitTrackedUsersListUpdate();
     });
 
     //A user has started sharing location
     clientSocket.on("connectTrackedUser", function(nickname) {
       //Add user on the tracked user list
       connectTrackedUser(clientSocket.id, nickname)
-
-      //Let the app knows that tracked users list was updated
-      emitTrackedUsersListUpdate();
     });
 
     //A user has stopped sharing location
     clientSocket.on("disconnectTrackedUser", function() {        
-      //Let everyone currently monitoring user location that the location is no longer been shared
-      emitTrackedUserHasStoppedSharingLocation(clientSocket.id)
-
-      //Remove user from the tracked user list
+      //Remove user from the tracked user list and emmit a message to the clients
       disconnectTrackedUser(clientSocket.id);
-      
-      //Let app know that we have a new tracked user list data
-      emitTrackedUsersListUpdate();
     });
 
     //When the app requests a updated list of tracked users (on app start for example)
@@ -88,10 +76,16 @@
       trackedUserInfo["nickname"] = nickname;      
 
       trackedUsers[clientSocket.id] = trackedUserInfo;  
+
+      //Let the app knows that tracked users list was updated
+      emitTrackedUsersListUpdate();
     }
 
     //Function remove a tracked user from tracked users list
     function disconnectTrackedUser(clientSocketId) {
+      //Let everyone currently monitoring user location that the location is no longer been shared
+      emitTrackedUserHasStoppedSharingLocation(clientSocketId)
+
       if (trackedUsers[clientSocketId] != null) {
         var message = "User " + trackedUsers[clientSocketId]["nickname"]+ " has stopped tracking. ";
         console.log(message);
@@ -99,6 +93,9 @@
         delete trackedUsers[clientSocketId]
         delete trackedUsersTrackers[clientSocketId]
       }
+
+      //Let app know that we have a new tracked user list data
+      emitTrackedUsersListUpdate();
     }
 
     //Function add a tracking user in trackedUsersTrackers list
